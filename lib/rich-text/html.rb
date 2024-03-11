@@ -6,13 +6,13 @@ module RichText
   class HTML
     ConfigError = Class.new(StandardError)
 
-    def self.render(delta, options={})
+    def self.render(delta, options = {})
       new(options).render(delta).inner_html
     end
 
     attr_reader :doc
 
-    def initialize(options={}, config=RichText.config)
+    def initialize(options = {}, config = RichText.config)
       @default_block_format = options[:default_block_format] || config.html_default_block_format
       @inline_formats = config.html_inline_formats.merge(options[:inline_formats] || {})
       @block_formats = config.html_block_formats.merge(options[:block_formats] || {})
@@ -24,7 +24,7 @@ module RichText
     end
 
     def render(delta)
-      raise TypeError.new("cannot convert retain or delete ops to html") unless delta.insert_only?
+      raise TypeError, 'cannot convert retain or delete ops to html' unless delta.insert_only?
 
       render_lines = []
 
@@ -46,7 +46,7 @@ module RichText
       @root
     end
 
-  private
+    private
 
     def inline_tag?(op)
       op.attributes.keys.find { |k| @inline_formats[k.to_sym]&.key?(:tag) }
@@ -92,7 +92,7 @@ module RichText
     end
 
     # renders a block for a collection of elements based on a final operation
-    def render_block(op, elements, default_block_format=@default_block_format)
+    def render_block(op, elements, default_block_format = @default_block_format)
       elements = elements.compact
       return unless elements.any?
 
@@ -103,10 +103,10 @@ module RichText
 
       # direct insertions (like "hr" tags) omit block format entirely
       # install these elements directly into the root flow
-      if !default_block_format
+      unless default_block_format
         # remove tag formats from from insertions without a block,
         # this assures that only custom (non-tag) formatters run on the element
-        block_attrs = Hash[block_attrs.reject { |k, v| @block_formats[k.to_sym].key?(:tag) }]
+        block_attrs = Hash[block_attrs.reject { |k, _v| @block_formats[k.to_sym].key?(:tag) }]
         return elements.each do |el|
           el = apply_formats(@block_formats, el, op, attributes: block_attrs)
           @root.add_child(el)
@@ -115,7 +115,7 @@ module RichText
 
       # assure that the block has a tag formatting attribute
       # use or build a format for the default format, when necessary
-      unless block_attrs.detect { |k, v| block_formats[k.to_sym].key?(:tag) }
+      unless block_attrs.detect { |k, _v| block_formats[k.to_sym].key?(:tag) }
         # if the default isn't an official format, built a one-off definition for it
         unless block_formats.key?(default_block_format.to_sym)
           block_formats = block_formats.merge(default_block_format.to_sym => { tag: default_block_format.to_s })
@@ -129,13 +129,13 @@ module RichText
       @root.add_child(el)
     end
 
-    def apply_formats(formats, content, op, attributes:nil)
+    def apply_formats(formats, content, op, attributes: nil)
       attributes ||= op.attributes
 
       # order of operations for rendering formats
       # tag formats are applied first (sorted by priority)
       # other attribute formats follow (sorted by priority)
-      ordered_formats = attributes.keys.map {|k| formats[k.to_sym] }.compact.sort do |a, b|
+      ordered_formats = attributes.keys.map { |k| formats[k.to_sym] }.compact.sort do |a, b|
         a = [a.key?(:tag) ? 0 : 1, a[:priority] || Float::INFINITY]
         b = [b.key?(:tag) ? 0 : 1, b[:priority] || Float::INFINITY]
         a <=> b
@@ -148,13 +148,9 @@ module RichText
     end
 
     def apply_format(format, content, op)
-      if format[:tag]
-        content = create_node(format, content, op: op)
-      end
+      content = create_node(format, content, op: op) if format[:tag]
 
-      if format[:apply] && format[:apply].respond_to?(:call)
-        format[:apply].call(content, op, @context)
-      end
+      format[:apply].call(content, op, @context) if format[:apply] && format[:apply].respond_to?(:call)
 
       if format[:parent]
         # build wrapper into a hierarchy of parents
@@ -174,7 +170,7 @@ module RichText
       content
     end
 
-    def create_node(format={}, content=nil, tag:nil, op:nil)
+    def create_node(format = {}, content = nil, tag: nil, op: nil)
       tag ||= format[:tag]
       tag = 'span' if tag.respond_to?(:call)
       el = Nokogiri::XML::Node.new(tag, @doc)
@@ -187,12 +183,9 @@ module RichText
         content.each { |n| el.add_child(n) }
       end
 
-      if format[:tag].respond_to?(:call) && op
-        el = format[:tag].call(el, op, @context)
-      end
+      el = format[:tag].call(el, op, @context) if format[:tag].respond_to?(:call) && op
 
       el
     end
-
   end
 end

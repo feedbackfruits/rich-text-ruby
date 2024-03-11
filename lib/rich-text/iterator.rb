@@ -8,6 +8,7 @@ module RichText
 
     def each(size = 1)
       return enum_for(:each, size) unless block_given?
+
       yield self.next(size) while next?
     end
 
@@ -26,19 +27,17 @@ module RichText
     def next(length = Float::INFINITY)
       next_op = @ops[@index]
       offset = @offset
-      if next_op
-        if length >= next_op.length - offset
-          length = next_op.length - offset
-          @index += 1
-          @offset = 0
-        else
-          @offset += length
-        end
+      return Op.new(:retain, Float::INFINITY) unless next_op
 
-        next_op.slice(offset, length)
+      if length >= next_op.length - offset
+        length = next_op.length - offset
+        @index += 1
+        @offset = 0
       else
-        return Op.new(:retain, Float::INFINITY)
+        @offset += length
       end
+
+      next_op.slice(offset, length)
     end
 
     def reset

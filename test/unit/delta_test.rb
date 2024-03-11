@@ -145,53 +145,51 @@ describe RichText::Delta do
   describe 'to_h' do
     it 'returns a hash with an :ops key' do
       assert_equal({
-        :ops => [
-          { :insert => 'abc' },
-          { :retain => 3, :attributes => { :x => 1 } },
-          { :delete => 3 }
-        ]
-      }, subject.insert('abc').retain(3, x: 1).delete(3).to_h)
+                     ops: [
+                       { insert: 'abc' },
+                       { retain: 3, attributes: { x: 1 } },
+                       { delete: 3 }
+                     ]
+                   }, subject.insert('abc').retain(3, x: 1).delete(3).to_h)
     end
   end
 
   describe 'to_plaintext' do
     it 'renders a string of plaintext' do
       subject = RichText::Delta.new([
-        { insert: 'a man, ' },
-        { insert: 'a plan', attributes: { italic: true } },
-        { insert: ', ' },
-        { insert: 'panama', attributes: { bold: true } },
-        { insert: "\n" },
-        { insert: "visit!\n" },
-      ])
+                                      { insert: 'a man, ' },
+                                      { insert: 'a plan', attributes: { italic: true } },
+                                      { insert: ', ' },
+                                      { insert: 'panama', attributes: { bold: true } },
+                                      { insert: "\n" },
+                                      { insert: "visit!\n" }
+                                    ])
       assert_equal("a man, a plan, panama\nvisit!", subject.to_plaintext)
     end
 
     it 'renders plaintext without objects and extra newlines' do
       subject = RichText::Delta.new([
-        { insert: "kittens\n" },
-        { insert: { image: { src: 'https://placekitten.com/200/150' } } },
-        { insert: "\n" },
-        { insert: { oembed: { url: 'https://youtu.be/KaOC9danxNo' } } },
-        { insert: "\n" },
-        { insert: "in space\n" }
-      ])
+                                      { insert: "kittens\n" },
+                                      { insert: { image: { src: 'https://placekitten.com/200/150' } } },
+                                      { insert: "\n" },
+                                      { insert: { oembed: { url: 'https://youtu.be/KaOC9danxNo' } } },
+                                      { insert: "\n" },
+                                      { insert: "in space\n" }
+                                    ])
       assert_equal("kittens\n\n\nin space", subject.to_plaintext)
     end
 
     it 'renders plaintext with block handler for objects' do
       subject = RichText::Delta.new([
-        { insert: "kittens\n" },
-        { insert: { image: { src: 'https://placekitten.com/200/150' } } },
-        { insert: "\n" },
-        { insert: { oembed: { url: 'https://youtu.be/KaOC9danxNo' } } },
-        { insert: "\n" },
-        { insert: "in space\n" }
-      ])
+                                      { insert: "kittens\n" },
+                                      { insert: { image: { src: 'https://placekitten.com/200/150' } } },
+                                      { insert: "\n" },
+                                      { insert: { oembed: { url: 'https://youtu.be/KaOC9danxNo' } } },
+                                      { insert: "\n" },
+                                      { insert: "in space\n" }
+                                    ])
       result = subject.to_plaintext do |op|
-        if op.value.key?(:image)
-          op.value[:image][:src]
-        end
+        op.value[:image][:src] if op.value.key?(:image)
       end
       assert_equal("kittens\nhttps://placekitten.com/200/150\n\nin space", result)
     end
@@ -221,11 +219,11 @@ describe RichText::Delta do
     let(:d) { RichText::Delta.new.delete(1) }
 
     it 'insert + insert' do
-      assert_equal RichText::Delta.new.insert("ba"), a.compose(b)
+      assert_equal RichText::Delta.new.insert('ba'), a.compose(b)
     end
 
     it 'insert + retain' do
-      assert_equal RichText::Delta.new.insert("a", {:x=>1}), a.compose(x)
+      assert_equal RichText::Delta.new.insert('a', { x: 1 }), a.compose(x)
     end
 
     it 'insert + delete' do
@@ -233,11 +231,11 @@ describe RichText::Delta do
     end
 
     it 'delete + insert' do
-      assert_equal RichText::Delta.new.insert("a").delete(1), d.compose(a)
+      assert_equal RichText::Delta.new.insert('a').delete(1), d.compose(a)
     end
 
     it 'delete + retain' do
-      assert_equal RichText::Delta.new.delete(1).retain(1, {:x=>1}), d.compose(x)
+      assert_equal RichText::Delta.new.delete(1).retain(1, { x: 1 }), d.compose(x)
     end
 
     it 'delete + delete' do
@@ -245,11 +243,11 @@ describe RichText::Delta do
     end
 
     it 'retain + insert' do
-      assert_equal RichText::Delta.new.insert("a").retain(1, {:x=>1}), x.compose(a)
+      assert_equal RichText::Delta.new.insert('a').retain(1, { x: 1 }), x.compose(a)
     end
 
     it 'retain + retain' do
-      assert_equal RichText::Delta.new.retain(1, {:y=>1, :x=>1}), x.compose(y)
+      assert_equal RichText::Delta.new.retain(1, { y: 1, x: 1 }), x.compose(y)
     end
 
     it 'retain + delete' do
