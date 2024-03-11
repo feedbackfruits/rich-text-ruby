@@ -21,12 +21,12 @@ Gem::Specification.new do |spec|
 
   spec.required_ruby_version = '>= 3.3.0'
 
-  spec.add_dependency 'activesupport', '>= 7.1.3'
-  spec.add_dependency 'diff-lcs', '>= 1.5.1'
-  spec.add_dependency 'nokogiri', '>= 1.16.2'
+  spec.add_dependency 'activesupport', '~> 7.1'
+  spec.add_dependency 'diff-lcs', '~> 1.5'
+  spec.add_dependency 'nokogiri', '~> 1.16'
 
-  spec.add_development_dependency 'bundler'
-  spec.add_development_dependency 'minitest'
-  spec.add_development_dependency 'rake'
-  spec.add_development_dependency 'yard'
+  spec.add_development_dependency 'bundler', '~> 2.5'
+  spec.add_development_dependency 'minitest', '~> 5.22'
+  spec.add_development_dependency 'rake', '~> 13.1'
+  spec.add_development_dependency 'yard', '~> 0.9'
 end
