@@ -208,9 +208,6 @@ describe RichText::Delta do
   #   end
   # end
 
-  describe '=~' do
-  end
-
   describe 'compose' do
     let(:a) { RichText::Delta.new.insert('a') }
     let(:b) { RichText::Delta.new.insert('b') }

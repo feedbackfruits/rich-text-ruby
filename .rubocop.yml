@@ -1,0 +1,166 @@
+AllCops:
+  NewCops: enable
+  TargetRubyVersion: 3.3.0
+
+Bundler/OrderedGems:
+  Enabled: false
+
+Layout/ArgumentAlignment:
+  Enabled: false
+  EnforcedStyle: with_fixed_indentation
+
+Layout/BlockEndNewline:
+  Enabled: false
+
+Layout/DefEndAlignment:
+  EnforcedStyleAlignWith: 'start_of_line'
+
+Layout/ElseAlignment:
+  Enabled: false
+
+Layout/EndAlignment:
+  EnforcedStyleAlignWith: 'start_of_line'
+
+Layout/FirstArgumentIndentation:
+  EnforcedStyle: 'consistent'
+
+Layout/FirstArrayElementIndentation:
+  EnforcedStyle: 'consistent'
+
+Layout/FirstHashElementIndentation:
+  EnforcedStyle: 'consistent'
+
+Layout/HashAlignment:
+  Exclude:
+    - 'lib/tasks/auto_annotate_models.rake'
+
+Layout/IndentationWidth:
+  Enabled: false
+
+Layout/LineLength:
+  Enabled: false
+
+Layout/MultilineBlockLayout:
+  Enabled: false
+
+Layout/MultilineMethodCallBraceLayout:
+  Enabled: false
+
+Layout/MultilineMethodCallIndentation:
+  Enabled: false
+
+Layout/ParameterAlignment:
+  EnforcedStyle: 'with_first_parameter'
+
+Layout/RescueEnsureAlignment:
+  Enabled: false
+
+Lint/AmbiguousBlockAssociation:
+  Enabled: false
+
+Lint/ShadowingOuterLocalVariable:
+  Enabled: false
+
+Lint/SuppressedException:
+  Exclude:
+    - 'db/**/*'
+
+Lint/UnusedMethodArgument:
+  AllowUnusedKeywordArguments: true
+
+Metrics/AbcSize:
+  Max: 66
+  Exclude:
+    - '**/db/**/*'
+
+Metrics/BlockLength:
+  Enabled: false
+
+Metrics/ClassLength:
+  Enabled: false
+
+Metrics/CyclomaticComplexity:
+  Max: 15
+
+Metrics/MethodLength:
+  Enabled: false
+
+Metrics/ModuleLength:
+  Enabled: false
+
+Metrics/ParameterLists:
+  Max: 6
+
+Metrics/PerceivedComplexity:
+  Max: 15
+
+Naming/VariableNumber:
+  CheckSymbols: false
+
+Naming/BlockForwarding:
+  Enabled: false
+
+Style/Alias:
+  EnforcedStyle: 'prefer_alias_method'
+
+Style/NumericLiterals:
+  AllowedPatterns:
+    - \d{4}_\d{2}_\d{2}_\d{6}
+
+Style/Documentation:
+  Enabled: false
+
+Style/EmptyMethod:
+  Enabled: false
+
+Style/FrozenStringLiteralComment:
+  Enabled: false
+
+Style/HashAsLastArrayItem:
+  EnforcedStyle: no_braces
+
+Style/IfInsideElse:
+  Enabled: false
+
+Style/IfUnlessModifier:
+  Enabled: false
+
+Style/Lambda:
+  EnforcedStyle: 'literal'
+
+Style/MixinUsage:
+  Exclude:
+    - 'bin/*'
+
+Style/MultilineBlockChain:
+  Enabled: false
+
+Style/MutableConstant:
+  Enabled: false
+
+Style/OpenStructUse:
+  Enabled: false
+
+Style/PercentLiteralDelimiters:
+  Enabled: false
+
+Style/PerlBackrefs:
+  Enabled: false
+
+Style/RegexpLiteral:
+  AllowInnerSlashes: true
+
+Style/RescueModifier:
+  Enabled: false
+
+Style/RescueStandardError:
+  Enabled: false
+
+Style/SymbolArray:
+  EnforcedStyle: 'brackets'
+
+Style/WordArray:
+  Enabled: false
+
+Style/HashSyntax:
+  Enabled: false
