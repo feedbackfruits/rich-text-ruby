@@ -3,7 +3,7 @@ require 'active_support/core_ext/hash/indifferent_access'
 module RichText
   # Operations are the immutable units of rich-text deltas and documents. As such, we have a class that wraps these values and provides convenient methods for querying type and contents, and for subdividing as needed by {Delta#slice}.
   class Op
-    TYPES = [:insert, :retain, :delete].freeze
+    TYPES = %i[insert retain delete].freeze
 
     # @return [Symbol] one of {TYPES}
     attr_reader :type
@@ -26,21 +26,19 @@ module RichText
       data = data.to_h.with_indifferent_access
       type_keys = (data.keys & TYPES.map(&:to_s))
       if type_keys.length != 1
-        raise ArgumentError.new("must be a Hash containing exactly one of the following keys: #{TYPES.inspect}")
+        raise ArgumentError, "must be a Hash containing exactly one of the following keys: #{TYPES.inspect}"
       end
 
       type = type_keys.first.to_sym
       value = data[type]
-      if [:retain, :delete].include?(type) && !value.is_a?(Integer)
-        raise ArgumentError.new("value must be an Integer when type is #{type.inspect}")
+      if %i[retain delete].include?(type) && !value.is_a?(Integer)
+        raise ArgumentError, "value must be an Integer when type is #{type.inspect}"
       end
 
       attributes = data[:attributes]
-      if attributes && !attributes.is_a?(Hash)
-        raise ArgumentError.new("attributes must be a Hash")
-      end
+      raise ArgumentError, 'attributes must be a Hash' if attributes && !attributes.is_a?(Hash)
 
-      self.new(type, value, attributes)
+      new(type, value, attributes)
     end
 
     # Creates a new Op object, based on a type, value, and attributes. No sanity checking is performed on the arguments; please use {Op.parse} for dealing with untrusted user input.
@@ -109,9 +107,8 @@ module RichText
       if insert?(String)
         Op.new(:insert, value.slice(start, len), attributes)
       elsif insert?
-        unless start == 0 && len == 1
-          raise ArgumentError.new("cannot subdivide a non-string insert")
-        end
+        raise ArgumentError, 'cannot subdivide a non-string insert' unless start == 0 && len == 1
+
         dup
       else
         Op.new(type, [value - start, len].min, attributes)
@@ -148,6 +145,6 @@ module RichText
     def ==(other)
       other.is_a?(Op) && type == other.type && value == other.value && attributes == other.attributes
     end
-    alias :eql? :==
+    alias eql? ==
   end
 end

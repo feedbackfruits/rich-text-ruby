@@ -3,11 +3,11 @@ require 'test_helper'
 describe RichText::Iterator do
   subject do
     RichText::Iterator.new([
-      RichText::Op.new(:insert, 'abc'),
-      RichText::Op.new(:retain, 3, { test: true }),
-      RichText::Op.new(:delete, 3),
-      RichText::Op.new(:insert, 'def')
-    ])
+                             RichText::Op.new(:insert, 'abc'),
+                             RichText::Op.new(:retain, 3, { test: true }),
+                             RichText::Op.new(:delete, 3),
+                             RichText::Op.new(:insert, 'def')
+                           ])
   end
 
   describe 'peek' do

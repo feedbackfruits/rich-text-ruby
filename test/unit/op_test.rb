@@ -136,14 +136,14 @@ describe RichText::Op do
 
   describe 'to_h' do
     it 'omits attributes when not present' do
-      assert_equal ({ :insert => 'abc' }), RichText::Op.new(:insert, 'abc').to_h
+      assert_equal ({ insert: 'abc' }), RichText::Op.new(:insert, 'abc').to_h
     end
 
     it 'includes attributes when present' do
       assert_equal({
-        :insert => 'abc',
-        :attributes => { :foo => true }
-      }, RichText::Op.new(:insert, 'abc', { foo: true }).to_h)
+                     insert: 'abc',
+                     attributes: { foo: true }
+                   }, RichText::Op.new(:insert, 'abc', { foo: true }).to_h)
     end
   end
 
@@ -157,7 +157,7 @@ describe RichText::Op do
 
     it 'omits class name when flag is passed' do
       assert_equal(
-        "retain=4 {:x=>1}",
+        'retain=4 {:x=>1}',
         RichText::Op.new(:retain, 4, { x: 1 }).inspect(false)
       )
     end

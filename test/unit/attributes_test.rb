@@ -2,7 +2,7 @@ require 'test_helper'
 
 describe RichText::Attributes do
   subject { RichText::Attributes }
-  let(:a) { { a: 1, b: 1, d: nil, x: 3  } }
+  let(:a) { { a: 1, b: 1, d: nil, x: 3 } }
   let(:b) { { a: 2, c: 2, x: 3 } }
 
   describe 'compose' do

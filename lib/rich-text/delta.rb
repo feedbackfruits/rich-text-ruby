@@ -30,8 +30,6 @@ module RichText
       else
         ArgumentError.new("Please provide either String, Array or Hash with an 'ops' key containing an Array")
       end
-
-      @ops
     end
 
     # Appends an insert operation. A no-op if the provided value is the empty string.
@@ -43,6 +41,7 @@ module RichText
     #   delta.insert({ image: 'http://i.imgur.com/FUCb95Y.gif' })
     def insert(value, attributes = {})
       return self if value.is_a?(String) && value.length == 0
+
       push(Op.new(:insert, value, attributes))
     end
 
@@ -53,6 +52,7 @@ module RichText
     #   delta.delete(5)
     def delete(value)
       return self if value <= 0
+
       push(Op.new(:delete, value))
     end
 
@@ -64,6 +64,7 @@ module RichText
     #   delta.retain(4).retain(5, { color: '#0c6' })
     def retain(value, attributes = {})
       return self if value <= 0
+
       push(Op.new(:retain, value, attributes))
     end
 
@@ -85,7 +86,7 @@ module RichText
         if last_op.delete? && op.insert?
           index -= 1
           last_op = @ops[index - 1]
-          if !last_op
+          unless last_op
             @ops.unshift(op)
             return self
           end
@@ -108,18 +109,16 @@ module RichText
         @ops[index, 0] = op
       end
 
-      return self
+      self
     end
-    alias :<< :push
+    alias << push
 
     # Modifies self by removing the last op if it was a retain without attributes.
     # @return [Delta] `self` for chainability
     def chop!
       last_op = @ops.last
-      if last_op && last_op.retain? && !last_op.attributes?
-        @ops.pop
-      end
-      return self
+      @ops.pop if last_op && last_op.retain? && !last_op.attributes?
+      self
     end
 
     # Returns true if all operations are inserts, i.e. a fully-composed document
@@ -127,12 +126,13 @@ module RichText
     def insert_only?
       @ops.all?(&:insert?)
     end
-    alias :document? :insert_only?
+    alias document? insert_only?
 
     # Returns true if the last operation is a string insert that ends with a `\n` character.
     # @return [Boolean]
     def trailing_newline?
       return false unless @ops.last && @ops.last.insert?(String)
+
       @ops.last.value.end_with?("\n")
     end
 
@@ -140,8 +140,8 @@ module RichText
     # @param other [Delta]
     # @return [Boolean]
     # @todo Not implemented yet
-    def include?(other)
-      raise NotImplementedError.new("TODO")
+    def include?(_other)
+      raise NotImplementedError, 'TODO'
     end
 
     # Yields ops of at most `size` length to the block, or returns an enumerator which will do the same
@@ -151,9 +151,10 @@ module RichText
     # @example
     #   delta = RichText::Delta.new.insert('abc')
     #   delta.each_slice(2).to_a # => [#<RichText::Op insert="ab">, #<RichText::Op insert="c">]
-    def each_slice(size = 1)
+    def each_slice(size = 1, &block)
       return enum_for(:each_slice, size) unless block_given?
-      Iterator.new(@ops).each(size) { |op| yield op }
+
+      Iterator.new(@ops).each(size, &block)
       self
     end
 
@@ -167,6 +168,7 @@ module RichText
     #   delta.each_char.to_a # => [["a", { bold: true }], ["b", {}], [{ image: "http://i.imgur.com/YtQPTnw.gif" }, {}]]
     def each_char
       return enum_for(:each_char) unless block_given?
+
       each_slice(1) { |op| yield op.value, op.attributes }
       self
     end
@@ -186,7 +188,7 @@ module RichText
 
       while iter.next?
         op = iter.next
-        if !op.insert?(String)
+        unless op.insert?(String)
           line.push(op)
           next
         end
@@ -199,9 +201,7 @@ module RichText
           offset = idx + 1
         end
 
-        if offset < op.value.length
-          line.push op.slice(offset)
-        end
+        line.push op.slice(offset) if offset < op.value.length
       end
 
       yield line if line.length > 0
@@ -210,9 +210,10 @@ module RichText
     # Yields each operation in the delta, as-is.
     # @yield [op] an {Op} object
     # @return [Enumerator, Delta] if no block given, returns an {Enumerator}, else returns `self` for chainability
-    def each_op
+    def each_op(&block)
       return enum_for(:each_op) unless block_given?
-      @ops.each { |op| yield op }
+
+      @ops.each(&block)
       self
     end
 
@@ -254,9 +255,9 @@ module RichText
         end
         idx += op.length
       end
-      return delta
+      delta
     end
-    alias :[] :slice
+    alias [] slice
 
     # Returns a Delta that is equivalent to first applying the operations of `self`, then applying the operations of `other` on top of that.
     # @param other [Delta]
@@ -293,7 +294,7 @@ module RichText
       end
       delta.chop!
     end
-    alias :| :compose
+    alias | compose
 
     # Modifies `self` by the concatenating this and another document Delta's operations.
     # Correctly handles the case of merging the last operation of `self` with the first operation of `other`, if possible.
@@ -360,7 +361,7 @@ module RichText
 
       delta.chop!
     end
-    alias :- :diff
+    alias - diff
 
     # Transform other Delta against own operations, such that [transformation property 1 (TP1)](https://en.wikipedia.org/wiki/Operational_transformation#Convergence_properties) holds:
     #
@@ -384,6 +385,7 @@ module RichText
     #   a.transform(b, false) # => #<RichText::Delta [retain=1 {:color=>"#fff", :bold=>true}]>
     def transform(other, priority)
       return transform_position(other, priority) if other.is_a?(Integer)
+
       iter = Iterator.new(@ops)
       other_iter = Iterator.new(other.ops)
       delta = Delta.new
@@ -409,7 +411,7 @@ module RichText
       end
       delta.chop!
     end
-    alias :^ :transform
+    alias ^ transform
 
     # Transform an index against the current delta. Useful for shifting cursor & selection positions in response to remote changes.
     # @param index [Integer] an offset position that may be shifted by inserts and deletes happening beforehand
@@ -435,12 +437,12 @@ module RichText
         end
         offset += op.length
       end
-      return index
+      index
     end
 
     # @return [Hash] the Hash representation of this object, by converting each contained op into a Hash
     def to_h
-      { :ops => @ops.map(&:to_h) }
+      { ops: @ops.map(&:to_h) }
     end
 
     # @return [String] the JSON representation of this object, by delegating to {#to_h}
@@ -477,8 +479,8 @@ module RichText
     #   '#<RichText::Delta [retain=3, delete=1, insert="abc" {:bold=>true}, insert={:image=>"http://i.imgur.com/vwGN6.gif"}]>'
     def inspect
       str = "#<#{self.class.name} ["
-      str << @ops.map { |o| o.inspect(false) }.join(", ")
-      str << "]>"
+      str << @ops.map { |o| o.inspect(false) }.join(', ')
+      str << ']>'
     end
 
     # A Delta is equal to another if all the ops are equal.
@@ -487,6 +489,6 @@ module RichText
     def ==(other)
       other.is_a?(RichText::Delta) && @ops == other.ops
     end
-    alias_method :eql?, :==
+    alias eql? ==
   end
 end
