@@ -19,7 +19,7 @@ Gem::Specification.new do |spec|
   spec.executables   = spec.files.grep(%r{^exe/}) { |f| File.basename(f) }
   spec.require_paths = ['lib']
 
-  spec.required_ruby_version = '~> 3.3.6'
+  spec.required_ruby_version = '~> 3.4.1'
 
   spec.add_dependency 'activesupport', '~> 8.0'
   spec.add_dependency 'diff-lcs', '~> 1.5'
