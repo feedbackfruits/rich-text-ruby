@@ -135,7 +135,10 @@ module RichText
     #   RichText::Op.new(:insert, 'abc', { bold: true }).inspect(false) => 'insert="abc" {:bold=>true}'
     def inspect(wrap = true)
       str = "#{type}=#{value.inspect}"
-      str << " #{attributes.inspect}" if attributes?
+      if attributes?
+        formatted_attrs = attributes.map { |k,v| "#{k.inspect}=>#{v.inspect}" }.join(', ')
+        str << " {#{formatted_attrs}}"
+      end
       wrap ? "#<#{self.class.name} #{str}>" : str
     end
 
