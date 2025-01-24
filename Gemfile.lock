@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    rich-text (0.6.0)
+    rich-text (0.7.0)
       activesupport (~> 8.0)
       diff-lcs (~> 1.5)
       nokogiri (~> 1.16)
