@@ -53,7 +53,7 @@ GEM
     tzinfo (2.0.6)
       concurrent-ruby (~> 1.0)
     uri (1.0.2)
-    yard (0.9.37)
+    yard (0.9.44)
 
 PLATFORMS
   aarch64-linux
